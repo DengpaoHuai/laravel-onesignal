@@ -82,8 +82,14 @@ class OneSignalClient
         $this->additionalParams = [];
     }
 
+    public function tap($value, $callback)
+    {
+        $callback($value);
+        return $value;
+    }
+
     private function createGuzzleHandler() {
-        return tap(HandlerStack::create(new CurlHandler()), function (HandlerStack $handlerStack) {
+        return self::tap(HandlerStack::create(new CurlHandler()), function (HandlerStack $handlerStack) {
             $handlerStack->push(Middleware::retry(function ($retries, Psr7Request $request, Psr7Response $response = null, RequestException $exception = null) {
                 if ($retries >= $this->maxRetries) {
                     return false;
